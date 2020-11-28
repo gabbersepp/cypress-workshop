@@ -1,0 +1,23 @@
+{
+  "name": "cypress-workshop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "cy-open": "set \"CYPRESS_BRAND=otherbrand\" && set \"CYPRESS_ENV=release\" && cypress open --project ./6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabbersepp/cypress-workshop.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gabbersepp/cypress-workshop/issues"
+  },
+  "homepage": "https://github.com/gabbersepp/cypress-workshop#readme",
+  "dependencies": {
+    "chrome-remote-interface": "^0.28.2",
+    "cypress": "^5.1.0"
+  }
+}

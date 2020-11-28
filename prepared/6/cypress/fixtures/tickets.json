@@ -1,0 +1,69 @@
+[
+    {
+        "id": 10049,
+        "title": "HDC automationTest title 1575884142773",
+        "description": "HDC automationTest description 1575884142773",
+        "status": "Default.DataSources.TicketStatuses.Completed",
+        "processingStatus": "Default.DataSources.ProcessingStatuses.OutOfProcessing",
+        "person": {
+            "address": {
+                "zipCode": null,
+                "city": null,
+                "addressLine": null,
+                "id": 9
+            },
+            "company": null,
+            "addressId": 9,
+            "companyId": null,
+            "title": "Default.DataSources.Titles.Male",
+            "firstName": "TestUser",
+            "lastName": "autoCustomer",
+            "language": "Default.DataSources.Languages.De",
+            "country": null,
+            "eMail": "hdtestmail@firstanswerdev.de",
+            "phoneNumber": "+420605788799",
+            "faxNumber": "+420605744709",
+            "eMails": [{
+                    "value": "hdtestmail@firstanswerdev.de",
+                    "isPrimary": true,
+                    "id": 22
+                }
+            ],
+            "phoneNumbers": [{
+                    "value": "+420605788799",
+                    "isPrimary": true,
+                    "id": 23
+                }
+            ],
+            "faxNumbers": [{
+                    "value": "+420605744709",
+                    "isPrimary": true,
+                    "id": 24
+                }
+            ],
+            "externalReference": "9",
+            "hdcLoginAvailable": false,
+            "id": 9,
+            "additionalPersonInfo": null,
+            "gid": null,
+            "customerNumber": "kundenummer",
+            "lastImportDate": null,
+            "ef75c1a2-686a-4ee1-bed8-41f5f3d11b72": null,
+            "0c7dd5cc-10e3-40a8-9caa-526632a30aad": null
+        },
+        "company": null,
+        "lastAccessDate": "2019-12-09T09:37:04Z",
+        "creationDate": "2019-12-09T09:37:03Z",
+        "ticketItems": [{
+                "id": 10117,
+                "fromCustomer": false,
+                "userFeedback": false,
+                "description": "Sehr geehrte/r Herr/Frau autoCustomer,<br>vielen Dank für Ihre Anfrage vom TT.MM.JJJJ.<br>Diese wurde unter der Nr. 10049 erfasst.<br>Bei Rückfragen geben Sie bitte immer diese Nummer mit an.<br>Sobald wir weitere Informationen haben, melden wir uns.<br><br>",
+                "type": "Email",
+                "creationDate": "2019-12-09T09:37:03Z",
+                "files": []
+            }
+        ],
+        "files": []
+      }
+]

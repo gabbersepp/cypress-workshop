@@ -1,0 +1,14 @@
+<button id="test">
+    Laden
+    </button>
+    <div id="json">
+    
+    </div>
+    
+    <script>
+    document.querySelector("#test").addEventListener("click", () => {
+    fetch('https://jsonplaceholder.typicode.com/todos/1')
+      .then(response => response.json())
+      .then(json => document.querySelector("#json").textContent = JSON.stringify(json))
+    })
+    </script>
