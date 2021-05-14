@@ -27,7 +27,7 @@ Cypress.Commands.add("newTicket2", () => {
 
 describe("test", () => {
     it("", () => {
-        cy.login("developer", "test")
+        cy.login("developer", "Test12")
         cy.visit("/#/ticket/28")
         cy.newTicket().then(id => {
             debugger;

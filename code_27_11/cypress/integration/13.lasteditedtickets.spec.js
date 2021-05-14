@@ -8,7 +8,7 @@ describe("test", () => {
 
         cy.route("GET", /.*getlasteditedtickets.*/i, "fixture:")
 
-        cy.login("developer", "test")
+        cy.login("developer", "Test12")
 
         const dateStr = "Letzter Zugriff vor etwa 15 Stunden";
         cy.get(".last-edited-tickets-list").should("contain", dateStr)

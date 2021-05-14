@@ -7,6 +7,6 @@ describe("test", () => {
             })
         })
         
-        cy.login("developer", "test")
+        cy.login("developer", "Test12")
     })
 })

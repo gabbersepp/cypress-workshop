@@ -1,7 +1,7 @@
 describe("HDA", () => {
     it("navigation items must be clickable", () => {
-        cy.login("developer", "test");
-        cy.visit("https://demo.firstanswer.de/Admin");
+        cy.login("developer", "Test12");
+        cy.visit("http://biehler-josef.de:9500/Admin");
 
         // the first header will be empty because initially there is no header
         let header = "dummy value";

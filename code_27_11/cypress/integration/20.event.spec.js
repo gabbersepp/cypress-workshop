@@ -5,7 +5,7 @@ describe("events", () => {
 
     // ticket anlegen mit betroffenen kontakt
     it("test", () => {
-        cy.login("developer", "test");
+        cy.login("developer", "Test12");
         cy.visit("/#/ticket/29")
         cy.get(".calling-card").should("contain", "tastatur")
         publishAureliaEvent(`entity:configurationitem:deleted:2`, 2);

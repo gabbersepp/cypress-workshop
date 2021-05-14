@@ -9,8 +9,8 @@
     "cy-run-single": "cypress run --spec cypress/integration/temp.spec.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "cypress": "^5.1.0"
+    "cypress": "^7.3.0"
   }
 }

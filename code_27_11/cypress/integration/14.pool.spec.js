@@ -92,7 +92,7 @@ describe("Ticket pool", () => {
             }
         }).as("loaddata");
 
-        cy.login("developer", "test").then(() => cy.visit("https://demo.firstanswer.de/#/pool/"));
+        cy.login("developer", "Test12").then(() => cy.visit("http://biehler-josef.de:9500/HD/#/pool/"));
         // initialer aufruf -> status offen
         cy.wait("@loaddata");
         cy.get("#ticketPoolResultTable").should("contain", "Ticket status offen");
@@ -111,8 +111,8 @@ describe("Ticket pool", () => {
     it.only("wait mit alias", () => {
         cy.server();
         cy.route("POST", /.*loadData.*/).as("loadData");
-        cy.login("developer", "test")
-        cy.visit("https://demo.firstanswer.de/#/pool/")
+        cy.login("developer", "Test12")
+        cy.visit("http://biehler-josef.de:9500/HD/#/pool/")
         cy.get("#generic-pool-result-view .refresh").click()
         cy.wait("@loadData.2").then(response => {
             debugger;

@@ -21,7 +21,7 @@ describe("test", () => {
     })
 
     it.only("", () => {
-        cy.login("developer", "test")
+        cy.login("developer", "Test12")
         cy.newTicket();
         cy.newTicket();
         cy.newTicket();

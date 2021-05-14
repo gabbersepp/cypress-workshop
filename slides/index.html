@@ -60,7 +60,7 @@
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Code (demnächst)
+							## Code
 							+ https://github.com/gabbersepp/cypress-workshop
 
 						</textarea>
@@ -81,7 +81,7 @@
 							## Start
 							```js
 							npm init
-							npm install cypress@5.1.0
+							npm install cypress@7.3.0
 							```
 							Zwei NPM Scripts anlegen:
 							```js
@@ -100,7 +100,7 @@
 							*cypress.json* im Rootverzeichnis anlegen:
 							```js
 							{
-								"baseUrl": "http://localhost/HelpdeskApp",
+								"baseUrl": "http://biehler-josef.de:9500/HD",
 								"defaultCommandTimeout": 30000
 							}						
 							```
@@ -108,7 +108,12 @@
 							- */cypress/integration*
 							- */cypress/plugins*
 							- */cypress/support*
-	
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Startprojekt
+							TODO: link einfügen
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -172,6 +177,15 @@
 							npm run cy-run
 							```
 	
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Tipp: Cypress Cache aufräumen
+							+ jede Cypress Version benötigt etwa 600MB
+							+ C:/Users/jbiehler/AppData/Local/Cypress/Cache
+							+  ```cypress cache prune```
+							+ oder einfach Ordner löschen ;-P
 						</textarea>
 					</section>
 				</section>
@@ -282,8 +296,18 @@
 
 					<section data-markdown>
 						<textarea data-template>
+							## not.visible vs not.exists
+							```js
+							cy.get("nicht-vorhanden").should("not.visible")
+							```
+							+ führt zu Fehler
+							+ nicht vorhandene Elemente können nur mit "not.exists" geprüft werden
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
 							## Übung
-							+ Projekt aufsetzen
 							+ ein paar Asserts durchführen
 							+ dazu notwendig: cy.wrap()
 

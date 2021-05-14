@@ -1,6 +1,6 @@
 
 describe("test", () => {
     it("test3", () => {
-        cy.login("developer", "test")
+        cy.login("developer", "Test12")
     })
 })

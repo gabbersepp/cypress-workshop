@@ -14,8 +14,8 @@ describe("test", () => {
         cy.route("POST", /.*getFieldRecommendationsFromText.*/)
         .as("classifierRequest")       
 
-        cy.login("developer", "test")
-        cy.visit("https://demo.firstanswer.de/#/ticket/28")
+        cy.login("developer", "Test12")
+        cy.visit("http://biehler-josef.de:9500/HD/#/ticket/28")
         cy.wait("@classifierRequest")
 
         cy.get("bsdfsadfsdfsd").should("not.exist")

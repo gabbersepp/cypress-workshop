@@ -1,5 +1,4 @@
 {
-    "baseUrl": "https://demo.firstanswer.de",
-    "defaultCommandTimeout": 30000,
-    "experimentalNetworkStubbing": true 
+    "baseUrl": "http://biehler-josef.de:9500/HD/",
+    "defaultCommandTimeout": 30000 
 }
