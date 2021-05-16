@@ -113,7 +113,7 @@
 					<section data-markdown>
 						<textarea data-template>
 							## Startprojekt
-							TODO: link einfügen
+							[https://github.com/gabbersepp/cypress-workshop/tree/master/prepared](https://github.com/gabbersepp/cypress-workshop/tree/master/prepared)
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -233,16 +233,6 @@
 							```js
 							cy.get("body").should("contain", "Test")
 							```
-
-							<aside class="notes" data-markdown>
-								```js
-								describe("assertions", () => {
-									it("test", () => {
-										cy.wrap({ test: 1 }).should("have.any.keys", "test")
-									})
-								});
-								```
-							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -253,7 +243,10 @@
 								// Logik und Asserts
 							})
 							```
-
+							
+							<aside class="notes" data-markdown>
+								Beispiel coden!
+							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -304,72 +297,82 @@
 							+ nicht vorhandene Elemente können nur mit "not.exists" geprüft werden
 						</textarea>
 					</section>
-
 					<section data-markdown>
 						<textarea data-template>
-							## Übung
-							+ ein paar Asserts durchführen
-							+ dazu notwendig: cy.wrap()
-
-						</textarea>
-					</section>
-				</section>
-
-				<section>
-					<section data-markdown>
-						<textarea data-template>
-							## Elemente ansprechen
-							+ get()
+							## Weitere Selektorfunktionen
 							+ find()
+							```js
+							cy.get("body").find("div")
+							```
 							+ last()
+							```js
+							cy.get("li").last()
+							```
 							+ first()
+							```js
+							cy.get("li").first()
+							```
 							+ contains()
+							```js
+							cy.visit("https://google.de").get("body").contains("Google Suche")
+							```
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Interaktion
 							+ type()
-							+ click()
-							+ focus()
-							
-						</textarea>
-					</section>
-
-					<section data-markdown>
-						<textarea data-template>
-							## Beispiel
 							```js
-							// siehe code
+							cy.get("input").type("bla{del}bla")
 							```
+							+ click()
+							```js
+							cy.get("button").click()
+							```
+							+ focus()
+							```js
+							cy.get("input").focus()
+							```
+						</textarea>
+					</section>
 
-							<aside class="notes" data-markdown>
-								```js
-								it("test", () => {
-									cy.visit("https://devopenspace.de/")
-										.get("nav").contains("WORKSHOPS").click()
-							
-									cy.get(".workshops").should("have.length.greaterThan", 10)
-										.last()
-										.should("contain", "Scrum für Product Owner")
-								})
-								```
-							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Übung
-							+ https://docs.cypress.io/ aufrufen
-							+ nach "cy.type" suchen
-							+ Suchergebnis anklicken
-						</textarea>
-					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Selektoren bestimmen
 							+ manchmal schwierig, wenn Elemente Fokus verlieren
 							+ da hilft: interaktive Modus und DOM Snapshots!
+
+							<aside class="notes" data-markdown>
+								Z.b. toastermeldung, welche verschwindet, im HD zeigen?
+
+								```
+								cy.visit("http://biehler-josef.de:9500/HD/#/ticket/635");
+								cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.Save").click()
+								```
+							</aside>
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							## Demo
+
+							<aside class="notes" data-markdown>
+								get, first, last, focus, type, click, wrap
+
+								Beispiel mit should cb
+							</aside>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Übung 1
+							+ https://docs.cypress.io/ aufrufen
+							+ nach "cy.type" suchen
+							+ Suchergebnis anklicken
+
+							## Übung 2
+							+ Prüfen, ob scrollTop von "*[ref='scrollableChat']" größer als 0 ist
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -389,20 +392,26 @@
 							- Manche Commands sind wiederholbar
 							- Es wird solange wiederholt bis Check erfolgreich oder Timeout abgelaufen ist
 						
-							<aside class="notes" data-markdown>
-								```js
-								it("test", () => {
-									cy.get("#wurst").should($e => {
-										console.log("retry")
-										// $e.length == 0
-										var div = document.createElement("div");
-										div.id = "wurst";
-										Cypress.$("body").append(div);
-										expect($e.length).to.be.greaterThan(0)
-									})
-								})
-								```
-							</aside>
+							```js
+							it("get() und should() wird wiederholt", () => {
+								setTimeout(() => {
+									const div = document.createElement("div");
+									div.id="newdiv";
+									div.textContent = "ASD";
+									Cypress.$("body").append(div);
+								}, 5000);
+						
+								cy.get("#newdiv").should($e => {
+									console.log(`Length: ${$e.length}`);
+									expect($e.length).greaterThan(0);
+								});
+							})
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>	
+						![](./own_assets/retry.png)
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -410,32 +419,33 @@
 							## then vs. should
 							+ should: retryable
 							+ then: nicht
-
-							<aside class="notes" data-markdown>
-								```js
-								it("nicht alles ist repeatable", () => {
-									let i = 0;
-									cy.get("body").then($e => {
-										console.log(i++);
-										expect(i).to.eq(2);
-									});
-								});
-
-								it("nicht alles ist repeatable - fix", () => {
-									let i = 0;
-									cy.get("body").should($e => {
-										console.log(i++);
-										expect(i).to.eq(2);
-									});
-								})
-								```
-							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## then falscher Anwendungsfall
-							+ invoke("text") als "Fix" in TS
+							```js
+							it("nicht alles ist repeatable", () => {
+								let i = 0;
+								cy.get("body").then($e => {
+									console.log(i++);
+									expect(i).to.eq(2);
+								});
+							});
+
+							
+							it("nicht alles ist repeatable - fix", () => {
+								let i = 0;
+								cy.get("body").should($e => {
+									console.log(i++);
+									expect(i).to.eq(2);
+								});
+							})
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							![](./own_assets/thenshould.png)
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -444,23 +454,19 @@
 							```js
 							it("should + command = vorsicht", () => {
 								cy.get("body").should($body => {
-									debugger
-									cy.get("div")
+									cy.get("body")
 								})
 							})
 							```		
 
+							![](./own_assets/shouldvorsicht.png)
 						</textarea>
 					</section>
-				</section>
 
-				<section>
 					<section data-markdown>
 						<textarea data-template>
 							## Videos und Screenshots
 							Cypress macht automatisch Videos & Screenshots
-	
-
 						</textarea>
 					</section>
 
@@ -469,89 +475,95 @@
 							## Eigene Screenshots
 							+ mit ```cy.screenshot``` command
 							+ auch auf einzelne Elemente möglich
+
+							```js
+							cy.get("button").screenshot()
+							```
 						</textarea>
 					</section>
-				</section>
 
-				<section data-markdown>
-					<textarea data-template>
-						## Debuggen
-						Am besten per ```debugger``` Statement
-					</textarea>
-				</section>
-
-				<section>
 					<section data-markdown>
 						<textarea data-template>
-							## Auf Promises
-							wird gewartet
-							
-							<aside class="notes" data-markdown>
-								```js
-								it("Auf Promises wird gewartet", () => {
-									const promise = new Promise(resolve => setTimeout(() => resolve("fertig"), 5000))
-									cy.then({ timeout: 10000 }, () => promise)
-										.then(result => expect(result).to.eq("fertig"))  
-								})
-								// geht auch mit wrap:
-								const promise = new Promise(resolve => setTimeout(() => resolve({
-									fn: () => "test"
-								}), 5000))
-						
-								cy.wrap(promise).invoke("fn").should("contain", "test")
-								```
-							</aside>
+							## Eigene Screenshots
+							+ ermöglichen Visuelle Tests
+							+ !! Screenshots unterscheiden sich (Environment, run, open)
 						</textarea>
 					</section>
-				</section>
-				<section>
+
+					<section data-markdown>
+						<textarea data-template>
+							## Debuggen
+							+ Am besten per ```debugger``` Statement
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							## Auf Promises wird gewartet
+							
+							```js
+							it("Auf Promises wird gewartet", () => {
+								const promise = new Promise(resolve => 
+									setTimeout(() => resolve("fertig"), 5000))
+
+								cy.then({ timeout: 10000 }, () => promise)
+									.then(result => expect(result).to.eq("fertig"))  
+							})
+							// geht auch mit wrap:
+							const promise = new Promise(resolve => setTimeout(() => resolve({
+								fn: () => "test"
+							}), 5000))
+					
+							cy.wrap(promise).invoke("fn").should("contain", "test")
+							```
+						</textarea>
+					</section>
+
 					<section data-markdown>
 						<textarea data-template>
 							## Asynchronität
 							+ Cypresscommands landen in Queue
 							+ Folge: Asynchronität
 	
-							<aside class="notes" data-markdown>
-								```js
-								it("Cypress ist asynchron", () => {
-									let $element = null;
-									cy.get("body").then($e => $element = $e);
-									expect($element).not.null;
-								});
-	
-								// richtig:
-	
-								```js
-								let $element = null;
-								cy.get(".add-tab-btn")
-									.then($e => $element = $e)
-									.then(() => expect($element).not.null)
-								```
-							</aside>
+							```js
+							// falsch:
+							let $element = null;
+							cy.get("body").then($e => $element = $e);
+							expect($element).not.null;
+
+							// richtig:
+							let $element = null;
+							cy.get(".add-tab-btn")
+								.then($e => $element = $e)
+								.then(() => expect($element).not.null)
+							```
 						</textarea>
 					</section>
 						
 					<section data-markdown>
 						<textarea data-template>
-							## Asyncronität
-							+ kein await möglich
+							## Asyncronität => kein await möglich
 
-							<aside class="notes" data-markdown>
-								```js
-								it("Cypress ist nicht awaitable", async () => {
-									const body = await cy.get("body");
-									const text = body.text();
-									// "funktioniert"
-									expect(text).contain("Google");
-									
-									// aber was ist damit:
-									cy.get("form[action*='search'] input[type='text']").type("biehler-josef.de");
-									const result = await cy.get("*[class*='__suggestions-inner-container']");
-									// schlägt fehl
-									expect(result.length).greaterThan(0);
-								})
-								```
-							</aside>
+							```js
+							const body = await cy.get("body");
+							const text = body.text();
+							// "funktioniert"
+							expect(text).contain("Google");
+							
+							// aber was ist damit:
+							cy.get("form[action*='search'] input[type='text']")
+								.type("biehler-josef.de");
+							const result = await cy
+								.get("*[class*='__suggestions-inner-container']");
+
+							// schlägt fehl
+							expect(result.length).greaterThan(0);
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Demo
 						</textarea>
 					</section>
 				</section>
@@ -573,33 +585,12 @@
 				<section>
 					<section data-markdown>
 						<textarea data-template>
-							## Häufig benutzte Cypress Assertions
-							```cy.get(...).should("contain", "test");
-							cy.get(...).should("exist");
-							cy.get(...).should("not.contain", "test");
-							```
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Ein paar Befehle zur Interaktion
-							```
-							cy.get(...).type("käse");
-							cy.get(...).click();
-							cy.get(...).focus();
-							```
-						</textarea>
-					</section>
-				</section>
-				<section>
-					<section data-markdown>
-						<textarea data-template>
 							## Übung
-							+ Projekt aufsetzen
-							+ Testcases:
-							  * Amazon.de besuchen
-							  * Lenovo suchen
-							  * sicherstellen, dass mindestens ein Suchergebnis vorhanden ist
+							+ Amazon.de besuchen
+							+ Lenovo suchen
+							+ sicherstellen, dass mindestens ein Suchergebnis vorhanden ist
+
+							// TODO: evtl Tipps?
 						</textarea>
 					</section>
 
@@ -629,20 +620,18 @@
 							## Login
 							+ in HD: Speicherung des Access Tokens in localStorage
 							+ möglich über die GUI
-							+ nicht sinnvoll
 							
-							<aside class="notes" data-markdown>
-								```js
-								cy.visit("/#/login");
-								cy.get("#usernameinput").type("developer");
-								cy.get("#passwordinput").type("test");
-								cy.get("#loginbutton").click();
-								cy.get(".add-tab-btn").should("exist");
-								```
-	
-								Aber nicht sinnvoll
-								+ man würde immer etwas testen, was man gar nicht testen will								
-							</aside>
+							```js
+							cy.visit("/#/login");
+							cy.get("#usernameinput").type("developer");
+							cy.get("#passwordinput").type("test");
+							cy.get("#loginbutton").click();
+							cy.get(".add-tab-btn").should("exist");
+							```
+
+							Aber nicht sinnvoll
+							+ man würde immer etwas testen, was man gar nicht testen will	
+							
 						</textarea>
 					</section>
 
@@ -650,61 +639,10 @@
 						<textarea data-template>
 							# Login
 							+ besser mittels Request und Manipulation localStorage
+							+ Code ist bereits im Startprojekt hinterlegt: *cy.login()*
 
 							<aside class="notes" data-markdown>
-								```js
-								function loginViaFetch(user, pw) {
-									const formData = new URLSearchParams();
-									formData.append("client_id", "HD");
-									formData.append("grant_type", "password");
-									formData.append("password", btoa(pw));
-									formData.append("username", user);
-									
-									return fetch("http://localhost/HelpdeskApi/token", {
-										method: "POST",
-										body: formData
-									})
-								}
-								
-								function saveToken(data) {
-									const { access_token, refresh_token } = data;
-									const expiry = new Date(data[".expires"]).getTime().toString();
-									window.localStorage.setItem("localtest_access_token", access_token);
-									window.localStorage.setItem("localtest_refresh_token", refresh_token);
-									window.localStorage.setItem("localtest_access_token_expiry_date", expiry);
-								}
-							
-								it("mit cy.request", () => {
-									cy.request({
-										body: {
-											client_id: "HD",
-											grant_type: "password",
-											password: btoa(""),
-											username: "developer"
-										},
-										form: true,
-										method: "POST",
-										url: "http://localhost/HelpdeskApi/token"
-									}).then(data => {
-										saveToken(data.body);
-									}).then(() => {
-										cy.visit("/");
-										cy.get(".add-tab-btn").should("exist");
-									})
-								})
-							
-								it("mit fetch() bzw beliebiger lib", () => {
-									cy.then(() => loginViaFetch("developer", ""))
-										.then((response) => {
-											return response.json();
-										})
-										.then(data => {
-											saveToken(data);
-											cy.visit("/");
-											cy.get(".add-tab-btn").should("exist");
-										})
-								})
-								```
+								mit fetch() oder axios etc kann gearbeitet werden
 							</aside>
 						</textarea>
 					</section>
@@ -717,8 +655,11 @@
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Übung: Login mit fetch
+							## Demo
 
+							<aside class="notes" data-markdown>
+								Einloggen, mit fetch() und axios() irgendeinen request machen und drauf warten
+							</aside>
 						</textarea>
 					</section>
 
