@@ -681,27 +681,7 @@
 							```
 							<aside class="notes" data-markdown>
 							Die Beispiele oben aus der Cypress Doku kopiert
-
-							```js
-							Cypress.Commands.add("login", (user, password) => {
-								cy.then(() => loginViaFetch(user, password))
-								.then((response) => {
-									return response.json();
-								})
-								.then(data => {
-									saveToken(data);
-									cy.visit("/");
-									cy.get(".add-tab-btn").should("exist");
-								})
-							 })
-							 ```
 							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Übung: Login auslagern
-
 						</textarea>
 					</section>
 
@@ -712,7 +692,7 @@
 							+ Nützlich: ```cy.verifyUpcomingAssertions```
 	
 							<aside class="notes" data-markdown>
-								Test: 2/2.retryable-command.spec.js
+								Test: 27.retryable-command.spec.js
 
 								```js
 								describe("Custom command", () => {     
@@ -756,6 +736,7 @@
 						<textarea data-template>
 							## Logging
 							+ cy.log()
+							+ Cypress.log
 
 						</textarea>
 					</section>
@@ -783,33 +764,45 @@
 							+ cy.log() schon
 							+ cy.log() für "normale" Verwendungen
 							+ Cypress.log() wenn keine asyncrone Vorgänge erlaubt sind
-
-							<aside class="notes" data-markdown>
-								```js
-								it("test", () => {
-									cy.wrap({ test: 1 }).should(obj => {
-										cy.log("test")
-										expect(obj.test).eq(1)
-									})
-								})
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Falsch
 							
-								it("test2", () => {
-									cy.wrap({ test: 1 }).should(obj => {
-										Cypress.log({
-											name: 'test',
-											displayName: 'test',
-											message: `test`,
-											consoleProps: () => {
-											return {
-												test: 1
-												}
-											}
-										})
-										expect(obj.test).eq(1)
-									})
+							```js
+							it("test", () => {
+								cy.wrap({ test: 1 }).should(obj => {
+									cy.log("test")
+									expect(obj.test).eq(1)
 								})
-								```
-							</aside>
+							})
+							```
+
+							![](./own_assets/cy.log.falsch.png)
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Richtig
+
+							```js
+							it("test2", () => {
+								cy.wrap({ test: 1 }).should(obj => {
+									Cypress.log({
+										name: 'test',
+										displayName: 'test',
+										message: `test`,
+										consoleProps: () => {
+										return {
+											test: 1
+											}
+										}
+									})
+									expect(obj.test).eq(1)
+								})
+							})
+							```
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -840,7 +833,8 @@
 							})
 						
 							it("test", () => {
-								cy.visit("https://google.de").get("body").doesContain("google");
+								cy.visit("https://google.de").get("body")
+									.doesContain("google");
 							})
 							```
 						</textarea>
@@ -848,10 +842,18 @@
 
 					<section data-markdown>
 						<textarea data-template>
+							## Demo
+
+							<aside class="notes" data-markdown>
+								cy.log, Cypress.log, log format, custom commands alle drei varianten
+							</aside>
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
 							## Übung
 							+ HD aufrufen und prüfen, ob die Seite geladen hat (anhand irgendeines Elementes)
-
-
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -867,18 +869,41 @@
 				<section>
 					<section data-markdown>
 						<textarea data-template>
-							## Maske zu Ticketneuanlage öffnen
-							
-							Was wir brauchen:
-							+ cy.location() zum Auslesen der ID
-							+ Locator für "Neues Ticket": #shellnewticket 					
-
-							## Übung
-							+ Parent command für "Neues Ticket" welches die ID bereit stellt
-
+							## Problem: welcher Tab ist offen?
+							+ Person, Company, CI, Ticket ??
+							+ und v.A. welche Id ??
+							+ wichtig bei: Klick auf beliebiges Ticket in Pool etc
+							+ immer dann, wenn keine spezifische Entität geöffnet wird
 						</textarea>
 					</section>
 
+					<section data-markdown>
+						<textarea data-template>
+							## Problem: welcher Tab ist offen?
+
+							Was wir brauchen:
+							+ cy.location() zum Auslesen der ID
+							+ Locator für Element, um gewechselten Tab sicherzustellen					
+
+							<aside class="notes" data-markdown>
+								z.b. ticketroot xyz oder so
+								damit man halt weis, dass im vergleich zu vorher nun ein anderes ticket gerendert wurde
+
+								zeigen, wo in der location die ID ist und wo im DOM!!!!
+							</aside>
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							## Übung
+							+ Parent command für "Neues Ticket" welches die ID bereit stellt
+
+							## Tipps
+							+ ID von Button: #shellnewticket
+
+						</textarea>
+					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Lösung
@@ -921,17 +946,24 @@
 							![](./own_assets/flyout.jpg)
 							+ das stört weitere Interaktion mit der Seite
 							+ "Einriffe" manchmal notwendig
+						</textarea>
+					</section>
 
-							<aside class="notes" data-markdown>
-								+ kann sein, dass Flyxout da bleibt
-								+ entfernen von Cookiebannern
-								+ entfernen von Fixed Elementen
-								.....
+					<section data-markdown>
+						<textarea data-template>
+							## Störende Elemente
 
-								```js
-								cy.get("#shellnewticket").click().get("body").click();
-								```
-							</aside>
+							+ entfernen von unerwünschten Flyout
+							+ entfernen von Cookiebannern
+							+ entfernen von Fixed Elementen
+							+ .....
+
+
+							```js
+							cy.get("body").then($e => $e.remove());
+							// oder
+							cy.get("body").click();
+							```
 						</textarea>
 					</section>
 
@@ -940,7 +972,12 @@
 							## Page object pattern
 							+ Locator immer so zu schreiben ist nervig und Fehleranfällig
 							+ unsere Lösung: Page Object (mehr oder weniger)
-							
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							![](./own_assets/pageobjectpattern.png)
 						</textarea>
 					</section>
 
@@ -954,6 +991,12 @@
 							cy.get("#Categoryn0").click();
 							// geht nicht :-(
 							```
+
+							<aside class="notes" data-markdown>
+								+ wurde mittlerweile ausgetauscht
+								+ zeig trotzdem kurz den Code
+								+ Select Bibliothek, kacke und so
+							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -961,8 +1004,6 @@
 							## Umgang mit Select2
 							+ Manche Libs machen die Testinteraktion schwierig
 							+ siehe Code...
-
-
 						</textarea>
 					</section>
 				</section>
@@ -973,44 +1014,48 @@
 							+ Cypress bereinigt State zwischen Tests
 							+ aber kein Reset der App
 							+ kein Reset von laufenden Requests!
-
-							<aside class="notes" data-markdown>
-								```js
-								it("Cypress bereinigt state zwischen tests", () => {
-									localStorage.setItem("blabla", "wurst");
+						</textarea>
+					</section>
+					<section>
+						<pre><code data-trim data-noescape data-line-numbers="1-7|9-16|18-27|29-33">
+							it("Cypress bereinigt state zwischen tests", () => {
+								localStorage.setItem("blabla", "wurst");
+							})
+						
+							it("deshalb ist der localstorage leer", () => {
+								expect(localStorage.getItem("blabla")).to.be.null;
+							})
+						
+							it("aber Cypress bereinigt nicht die App", () => {
+								cy.get("body").then($b => {
+									const div = document.createElement("div");
+									div.id = "newitem";
+									div.textContent = "test content";
+									$b.append(div);
 								})
-							
-								it("deshalb ist der localstorage leer", () => {
-									expect(localStorage.getItem("blabla")).to.be.null;
-								})
-							
-								it("aber Cypress bereinigt nicht die App", () => {
-									cy.get("body").then($b => {
-										const div = document.createElement("div");
-										div.id = "newitem";
-										div.textContent = "test content";
-										$b.append(div);
-									})
-								})
-							
-								it("wie man sieht", () => {
-									cy.get("#newitem").should("contain", "test content");
-								})
-							
-								it("das führt zu problemen -> nur schnell die App öffnen", () => {
-									cy.login("developer", "test");
-									cy.newTicket();
-									cy.newTicket();
-									cy.newTicket();
-								})
-							
-								// hier bereinigt Cypress localStorage, Cookies, ....
-							
-								it("und nochmal", () => cy.login("developer", "test"))
-							
-								// wie fixen? kA, liegt teils auch am AUT Code
-								```
-							</aside>
+							})
+						
+							it("wie man sieht", () => {
+								cy.get("#newitem").should("contain", "test content");
+							})
+						
+							it("das führt zu problemen -> nur schnell die App öffnen", () => {
+								cy.login("developer", "Test12");
+								cy.newTicket();
+								cy.newTicket();
+								cy.newTicket();
+							})
+						
+							// hier bereinigt Cypress localStorage, Cookies, ....
+						
+							it("und nochmal", () => cy.login("developer", "test"))
+						
+							// wie fixen? kA, liegt teils auch am AUT Code
+						</code></pre>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							![](./own_assets/state.png)
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -1029,10 +1074,10 @@
 				<section>
 					<section data-markdown>
 						<textarea data-template>
-							## Cypress Context
-							+ Vergleich der zwei Hashes bei Login
+							<h2>Cypress Context</h2>
+							<ul><li>Vergleich der zwei Hashes bei Login</li></ul> 
 	
-							```js
+							<pre><code data-trim data-noescape data-line-numbers="4-5">
 							Cypress.Commands.add("newTicket", () => {
 								cy.location().its("hash").as("loc");
 								cy.get("#shellnewticket").click().get("body").click();
@@ -1043,58 +1088,60 @@
 									return identifier;
 								})
 							 });
-							 ```
+							 </code></pre>
 	
-							+ spart eine Einrückungsebene
-							+ erfordert aber function Syntax
-
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Übung
-							+ Tickettitel mit Titel in Lösungsverlauf vergleichen
-							
-							![](./own_assets/uebungtitel.jpg)
-
+							 <ul>
+								 <li>spart eine Einrückungsebene</li>
+								 <li>erfordert aber <i>function</i> Syntax</li>
+							 </ul>
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Bedingte Prüfung
-							+ wenn Checkbox state xyz dann mach das
-							+ Ziel: Checkbox setzen
+							+ wenn xyz dann mach dies oder jenes
+							+ Achtung: Nicht unbedingt Best Practices, aber in Praxis notwendig
+							+ hilfreich: .then($e => ....) => JQuery!
+						</textarea>
+					</section>
+
+					<section data-markdown>
+						<textarea data-template>
+							## Übung
+							+ Checkbox anhacken
+							+ möglichen vorherigen Status beachten
+							+ ggf neue Person anlegen
 
 							<aside class="notes" data-markdown>
-								Three state checkbox zeigen
-								Neue CHeckox anlegen
-								Person anlegen und checkbox setzen
+								Neue person um konflikte zu vermeiden
+							</aside>
+						</textarea>
+					</section>
 
-								```js
+					<section data-markdown>
+						<textarea data-template>
+							## Bedingte Prüfung - Lösung
+							+ Cypress baut nur auf JQuery auf
+							+ innerhalb von then/should kann ALLES getan werden, was auch mit JQuery geht
+
+							<pre><code data-trim data-noescape data-line-numbers="7,9">
 								describe("should", () => {
 									it("test", () => {
-										cy.login("developer", "test");
-										cy.visit("http://localhost/HelpdeskApp/#/person/5");
-										cy.get("div").contains("Testcheckbox").parent().find("input-check-box-component").wait(500)
+										cy.login("developer", "Test12");
+										cy.visit("http://biehler-josef.de:9500/HD/#/person/5");
+										cy.get("div").contains("Vielleicht").parent()
+											.find("input-check-box-component").wait(500)
 										.then($e => {
-											debugger;
 											if ($e.find("img[src*='CheckBox_No']").length > 0) {
 												cy.wrap($e).click();
-											} else if ($e.find("img[src*='CheckBox_Yes']").length > 0) {
+											} else if 
+												($e.find("img[src*='CheckBox_Yes']").length > 0) {
 												// do nothing                
 											}
 										})
 									})
 								})
-								```
-							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Bedingte Prüfung
-							+ Cypress baut nur auf JQuery auf
-							+ innerhalb von then/should kann ALLES getan werden, was auch mit JQuery geht
+							</code></pre>
 						</textarea>
 					</section>
 				</section>
@@ -1113,9 +1160,161 @@
 					<section data-markdown>
 						<textarea data-template>
 							## Lösung: Requests mocken
-							+ cy.route() -> Mocken von XHR Requests
-							+ cy.route2() -> Experimentiell, erlaubt wesentlich mehr
+							+ cy.intercept()
 
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Requestergebnis beeinflussen
+
+							<pre><code data-line-numbers="5">
+							it("test", () => {
+								cy.login("developer", "Test12");
+								cy.visit("http://biehler-josef.de:9500/HD");
+								cy.intercept("GET", /.*GetPerson.*/i, {"address":{"city":"Arsch der Welt","zipCode":"92648","addressLine":"blablabla","id":5},"company":null,"addressId":5,"companyId":null,"title":"Default.DataSources.Titles.Male","firstName":"1619530006083 Max","lastName":"1619530006083 Mustermann","language":null,"country":null,"eMail":"1619530006085@firstanswerdev.de","phoneNumber":null,"faxNumber":null,"eMails":[{"value":"1619530006085@firstanswerdev.de","isPrimary":true,"id":8}],"phoneNumbers":[],"faxNumbers":[],"externalReference":null,"hdcLoginAvailable":false,"id":5,"additionalPersonInfo":null,"gid":null,"customerNumber":"1234","lastImportDate":null,"c87abe0c-9075-45f1-a35d-2094eb314327":null,"765905ba-9f2c-472a-83fc-de0a09c0db55":null})
+								cy.visit("http://biehler-josef.de:9500/HD/#/person/5");
+								cy.wait(50000);
+							})
+							</code></pre>
+
+							<aside class="notes">
+								Request erreicht Server gar nicht
+								Mit Breakpoint zeigen?
+							</aside>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Requestergebnis beeinflussen
+							![](./own_assets/arschderwelt.png)
+						</textarea>
+					</section>
+					<section  data-markdown>
+						<textarea data-template>
+							### Große JSON Objekte
+							+ was, wenn ich nur einen Wert ändern möchte, ohne dafür das ganze Objekt anzugeben?
+							+ Request senden und response bearbeiten
+							<pre><code>
+							cy.login("developer", "Test12");
+							cy.visit("http://biehler-josef.de:9500/HD");
+							cy.intercept("GET", /.*GetPerson.*/i, r => {
+								r.reply(interceptor => {
+									interceptor.body.address.city = "Arsch der Welt";
+								})
+							});
+							cy.visit("http://biehler-josef.de:9500/HD/#/person/5");
+							cy.wait(50000);
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### Auf Request warten
+							+ Sinnvoll!
+
+							<pre><code data-line-numbers="11">
+							cy.login("developer", "Test12");
+							cy.visit("http://biehler-josef.de:9500/HD");
+							cy.intercept("GET", /.*GetPerson.*/i, r => {
+								r.reply(interceptor => {
+									interceptor.body.address.city = "Arsch der Welt";
+								})
+							}).as("getperson");
+							cy.visit("http://biehler-josef.de:9500/HD/#/person/5");
+							cy.wait("@getperson").then(r => {
+								assert.equal(r.response.body.address.city, "Arsch der Welt")
+							});
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							### TicketPool mit unterschiedlichen Filtern testen
+							+ Daten mocken abhängig vom Requestbody
+
+							<pre>
+								<code data-line-numbers="1-5|6-20|22-36|41-46|48-52|54-57">	
+const response = {
+	moreItemsAvailable: false,
+	totalRowCount: 1
+}
+const tOpen = {"id":"676","type":"Ticket","selected":false,"data":{"aggregatedColumn_Ticketinfo":{"id":676,"title":"Ticket status offen","waitingStatus":"Default.DataSources.WaitingStatuses.NotWaiting","waitingReason":null,"waitingStatusUntil":null,"creationDate":"2021-04-30T07:21:32Z","status":"Default.DataSources.TicketStatuses.Open","category":"Test.Categories.NonRrpsAgPortfolio","assignedToId":1017,"assignedTo":"TestUser autoAgent2_team1","email":null,"reportedBy":{"person":{"firstName":"","lastName":"Samhammer","companyName":null},"company":null},"ticketInfoIcon":"User","ticketInfoIconTooltip":"userIconTicket","reminderProcessActive":false,"reminder":{"reminderKey":null,"currentReminderStep":0,"totalReminderSteps":0},"isNewInTeam":false,"slaInfo":{"isEscalated":true,"escalationInfoTooltip":"someSlasEscalated","runningSLAs":4,"escalatedSLAs":1},"isSubscribed":false},"column_ticket_Priority":"Test.ATD.SLAConfigurations.TicketSLAConfigurationOne.TicketPriorities.Standard","aggregatedColumn_Sla":{"slaRemainingTime":9692735.6005,"slaEndingDate":"2021-05-20T11:21:32Z","slaTranslationKey":"Test.ATD.SLACriteria.InterStatusTime","slaIsOverdue":true},"aggregatedColumn_Lastprocessing":{"assigneeName":"TestUser autoAgent2_team1","date":"2021-04-30T07:21:32Z","action":null,"workflowKey":null}}};
+const tInprocessing = {
+	type: "Ticket",
+	selected: false,
+	id: "2",
+	data: {
+		...tOpen.data,
+		aggregatedColumn_Ticketinfo: {
+			...tOpen.data.aggregatedColumn_Ticketinfo,
+			id: 2,
+			title: "ticket in bearbeitung",
+			assignedToId: 20,
+			assignedTo: "Josef Biehler",
+		}
+	}
+}
+cy.intercept("POST", /.*loaddata.*/i, req => {
+	const filter = req.body.filter[0];
+	if (filter && filter.filterKey === "status" && 
+		filter.values.indexOf("Default.DataSources.TicketStatuses.Open") >= 0) {
+			req.reply({...response, items: [tOpen]})
+	} else if (filter && filter.filterKey === "processingStatus" 
+		&& filter.values.indexOf("inProcessing") >= 0) {
+			req.reply({...response, items: [tInprocessing]})
+	} else {
+		req.reply({
+			moreItemsAvailable: false,
+			totalRowCount: 0
+		})
+	}
+}).as("loaddata");
+
+cy.login("developer", "Test12");
+cy.visit("http://biehler-josef.de:9500/HD/#/pool/")
+
+// initialer aufruf -> status offen
+cy.wait("@loaddata");
+cy.get("#ticketPoolResultTable")
+	.should("contain", "Ticket status offen");
+cy.get("#ticketPoolResultTable .generic-table-row")
+	.its("length").should("eq", 1);
+
+// status filter entfernen
+cy.get(".clear-multiselect abbr").click().wait("@loaddata");
+// "In Bearbeitung" Filter
+cy.get("#processingStatusFilter .choices").click()
+	.get(".choices__list").contains("In Bearbeitung").click();
+
+cy.get("#ticketPoolResultTable")
+	.should("contain", "ticket in bearbeitung");
+cy.get("#ticketPoolResultTable .generic-table-row")
+	.its("length").should("eq", 1);    
+								</code>
+							</pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Auf x. Request warten
+							+ z.b. zweiten loadData Request
+							+ möglich durch nummerisches Suffix im alias
+
+							```js
+							cy.intercept("POST", /.*loadData.*/).as("loadData");
+							cy.login("developer", "Test12").then(() => {
+								cy.visit("http://biehler-josef.de:9500/HD/#/pool/")
+								cy.get("#generic-pool-result-view .refresh").click()
+								cy.wait("@loadData.2");
+							})
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Demo
+							
 							<aside class="notes" data-markdown>
 								```js
 								describe("Last edited tickets", () => {
@@ -1141,118 +1340,6 @@
 										const dateSr = "Letzter Zugriff vor etwa 15 Stunden";
 										cy.get(".last-edited-tickets-list").should("contain", dateSr);
 									});
-								})
-								```
-							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Requests mit gleicher URL aber unterschiedlichem Req. Body
-							+ Problem: TicketPool mit unterschiedlichen Filtern testen
-							+ cy.route() erlaubt das nicht
-
-							*cypress.json* erweitern:
-
-							```js
-							"experimentalNetworkStubbing": true
-							```
-
-							<aside class="notes" data-markdown>
-								Ticketpool zeigen, auch DEV Tools
-
-								Daten kopier ich aus spec raus
-								
-								```js
-								it("should show correct tickets if filter changed", () => {
-									const response = {
-										moreItemsAvailable: false,
-										totalRowCount: 1
-									}
-									const tOpen = {
-										// siehe code ticketpool.spec.js
-									}
-									const tInprocessing = {
-										type: "Ticket",
-										selected: false,
-										id: "2",
-										data: {
-											...tOpen.data,
-											aggregatedColumn_Ticketinfo: {
-												...tOpen.data.aggregatedColumn_Ticketinfo,
-												id: 2,
-												title: "ticket in bearbeitung",
-												assignedToId: 20,
-												assignedTo: "Josef Biehler",
-											}
-										}
-									}
-									cy.route2("POST", /.*loaddata.*/i, req => {
-										const data = JSON.parse(req.body);
-										const filter = data.filter[0];
-										debugger;
-										if (filter && filter.filterKey === "status" && filter.values.indexOf("Default.DataSources.TicketStatuses.Open") >= 0) {
-											req.reply({...response, items: [tOpen]})
-										} else if (filter && filter.filterKey === "processingStatus" && filter.values.indexOf("inProcessing") >= 0) {
-											req.reply({...response, items: [tInprocessing]})
-										} else {
-											req.reply({
-												moreItemsAvailable: false,
-												totalRowCount: 0
-											})
-										}
-									}).as("loaddata");
-							
-									cy.login("developer", "Test12").then(() => cy.visit("http://localhost/HelpdeskApp/#/pool/"));
-									// initialer aufruf -> status offen
-									cy.wait("@loaddata");
-									cy.get("#ticketPoolResultTable").should("contain", "Ticket status offen");
-									cy.get("#ticketPoolResultTable .generic-table-row").its("length").should("eq", 1);
-							
-									// remove status filter
-									cy.get(".clear-multiselect abbr").click().wait("@loaddata");
-									// add processing filter
-									cy.get("#processingStatusFilter .choices").click()
-										.get(".choices__list").contains("In Bearbeitung").click();
-							
-									cy.get("#ticketPoolResultTable").should("contain", "ticket in bearbeitung");
-									cy.get("#ticketPoolResultTable .generic-table-row").its("length").should("eq", 1);    
-								});
-								```
-							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Requests & wait
-							+ cy.route(...).as("alias")
-							+ cy.wait("@alias").then(xhr => ...)
-							+ Warten sinnvoll bei SPA
-							+ Warten auch bei gemockten requests möglich
-
-							<aside class="notes" data-markdown>
-								Warten macht oft Sinn, v.a. bei Single Page Apps
-
-								Beispiel mit wait().then(xhr => ) zeigen
-							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Auf x. Request warten
-							+ z.b. zweiten loadData Request
-							+ möglich durch nummerisches Suffix im alias
-
-							<aside class="notes" data-markdown>
-								```js
-								it("wait mit alias", () => {
-									cy.server();
-									cy.route("POST", /.*loadData.*/).as("loadData");
-									cy.login("developer", "Test12").then(() => {
-										cy.visit("http://localhost/HelpdeskApp/#/pool/")
-										cy.get("#generic-pool-result-view .refresh").click()
-										cy.wait("@loadData.2");
-									})
 								})
 								```
 							</aside>
