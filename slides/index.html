@@ -114,6 +114,10 @@
 						<textarea data-template>
 							## Startprojekt
 							[https://github.com/gabbersepp/cypress-workshop/tree/master/prepared](https://github.com/gabbersepp/cypress-workshop/tree/master/prepared)
+
+							## VS Code templates
+							+ Gerade für Neueinsteiger im Team
+							+ Hürden abbauen
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -1074,6 +1078,33 @@
 				<section>
 					<section data-markdown>
 						<textarea data-template>
+							## its
+							+ cy.its("...") ruft das Feld mit dem entsprechenden Namen ab
+							+ cy.its() ist auch repeatable
+							
+							```js
+							describe("Its", () => {
+								it("repeatable", () => {
+									var obj = {
+										get test() {
+											console.log("retry");
+											return 1;
+										}
+									}
+									cy.wrap(obj).its("test").should("eq", 2);
+								})
+							})
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## its
+							![](./own_assets/its.png)
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
 							<h2>Cypress Context</h2>
 							<ul><li>Vergleich der zwei Hashes bei Login</li></ul> 
 	
@@ -1314,6 +1345,8 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					<section data-markdown>
 						<textarea data-template>
 							## Demo
+
+							// TODO: mehr machen?
 							
 							<aside class="notes" data-markdown>
 								```js
@@ -1322,8 +1355,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 										const d = new Date();
 										d.setHours(d.getHours()-15);
 									
-										cy.server();
-										cy.route("GET", /.*GetLastEditedTickets.*/, [
+										cy.intercept("GET", /.*GetLastEditedTickets.*/, [
 											{
 												lastActionDate: d.toISOString(),
 												ticket: {
@@ -1333,7 +1365,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 												}
 											}
 										])
-										cy.login("developer", "test");
+										cy.login("developer", "Test12");
 									});
 									
 									it("should show date string", () => {
@@ -1346,29 +1378,16 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						</textarea>
 					</section>
 					<section data-markdown>
-						<textarea data-template>
-							## its
-							+ cy.its("...") ruft das Feld mit dem entsprechenden Namen ab
-							+ cy.its() ist auch repeatable
-							
-							<aside class="notes" data-markdown>
-								Beispiel:
-								```js
-								describe("Its", () => {
-									it("repeatable", () => {
-										var obj = {
-											get test() {
-												console.log("retry");
-												return 1;
-											}
-										}
-										cy.wrap(obj).its("test").should("eq", 2);
-									})
-								})
-								```
-							</aside>
-						</textarea>
+						<section data-template>
+							## Übung
+							// TODO: besser ausformulieren, selber machen
+							+ Ticket aufrufen
+							+ Auf Request getTicket warten
+
+						</section>
 					</section>
+				</section>
+				<section>
 					<section data-markdown>
 						<textarea data-template>
 							## Fixtures
@@ -1376,22 +1395,41 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							+ evtl besser: Fixtures
 							+ Standardverzeichnis: "cypress/fixtures"
 
-							<aside class="notes" data-markdown>
-								+ Json Datei
-
-								Beispiel:
-								```js
-								[{"lastActionDate":"2020-11-13T19:13:28.748Z","ticket":{"id":1234,"title":"test ticket","category":"test kategorie"}}]
-								```
-
-								```js
-								it("test", () => {
-									cy.server();
-									cy.route("GET", /.*GetLastEditedTickets.*/, "fixture:test.json");
-									cy.login("developer", "Test12");
+							<pre><code data-line-numbers="6">
+							[
+								{
+									"lastActionDate": "2020-11-13T19:13:28.748Z",
+									"ticket": {
+										"id": "1234-ticketid",
+										"title": "test ticket",
+										"category": "test kategorie"
+									}
+								}
+							]	
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Fixtures
+						
+							<pre><code data-line-numbers="7,8,13,14">
+								describe("Last edited tickets", () => {
+									beforeEach(() => {
+										const d = new Date();
+										d.setHours(d.getHours()-15);
+									
+										cy.intercept("GET", /.*GetLastEditedTickets.*/, 
+											{ fixture: "test.json" })
+										cy.login("developer", "Test12");
+									});
+									
+									it("should show date string", () => {
+										cy.get(".last-edited-tickets-list")
+											.should("contain", "1234-ticketid");
+									});
 								})
-								```
-							</aside>
+							</code></pre>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -1410,88 +1448,28 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Fixtures - Etension für VS Code
-							+ Unterstützung bei Angabe von Fixture Dateipfad:
-							+ josefbiehler.cypress-fixture-intellisense
-							+ Intellisense für Fixturepfade
-
-							<aside class="notes" data-markdown>
-								wichtig: cypress.json im Projekt root!
-
-							</aside>
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## VS Code templates
-							+ Gerade für Neueinsteiger im Team
-							+ Hürden abbauen
-
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Fetch
-							+ cy.route() kann keine fetch() Requests tracken
-							+ dazu notwendig: cy.route2()
-
-							```js
-							describe("fetch", {baseUrl: null}, () => {
-								it("test", () => {
-									cy.server();
-									cy.route("GET", /.*todo.*/).as("todos");
-									cy.visit("./7.fetch.html")
-									cy.get("button#test").click().wait("@todos")
-								})
-
-								it("test2", () => {
-									cy.route2({
-										url: /.*/
-									}).as("todos");
-									cy.visit("./7.fetch.html")
-									cy.get("button#test").click().wait("@todos")
-								})
-							});
-							```
-
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Unter der Haube: route vs route2
-							+ **cy.route**: Wrappen von XMLHttpRequest
-							+ **cy.route2**: Kompletter Proxy, ermöglicht fetch, CSS, .....
-							+ https://glebbahmutov.com/blog/cy-route-vs-route2/ 
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
 							## Problem: Testen, dass Request nicht kommt
 							+ Szenario: Feldvorschläge
 							+ Keine Vorschläge bei bestehendem Ticket
 							+ Idee: try/catch
 
-							<aside class="notes" data-markdown>
-								Feldvorschläge erklären
-								Aktualisieren bei Titel + Beschreibung Änderung
-								Kein Vorschlag bei bestehendem Ticket!
-								-> Fehlermeldung von wait() zeigen
-								
-								```js
-								it("try/catch", () => {
-									cy.server();
-									cy.route("POST", /.*getFieldRecommendationsFromText.*/).as("request");
-									cy.login("developer", "Test12");
-									try {
-										cy.visit("http://localhost/HelpdeskApp/#/ticket/1").wait("@request");
-									} catch {
-										
-									}
-								})
-								```
-
-								Das kann natürlich nicht funktionieren, da Cypress async ist!
-							</aside>
+							![](./own_assets/spideragent.png)
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							<pre><code data-line-numbers="6-10">
+							it("try/catch", () => {
+								cy.server();
+								cy.route("POST", /.*getFieldRecommendationsFromText.*/).as("request");
+								cy.login("developer", "Test12");
+								try {
+									cy.visit("http://localhost/HelpdeskApp/#/ticket/1").wait("@request");
+								} catch {
+									
+								}
+							})
+							</code></pre>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -1502,33 +1480,31 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							+ https://docs.cypress.io/api/events/catalog-of-events.html 
 
 							![](./own_assets/feldvs.jpg)
-
-							<aside class="notes" data-markdown>
-								```js
-								it("cy.on", done => {
-									cy.on("fail", error => {
-										if (error.name === "CypressError"
-											&& error.message.toString()
-															.match(/.*timed out waiting `.*` for the 1st request to the route: `classifierRequest`.*/)) {
-												// calling done forces cypress to turn test to green
-												done();
-										}
-									});
-							
-									cy.server();
-									cy.route("POST", /.*getFieldRecommendationsFromText.*/).as("classifierRequest");
-									cy.login("developer", "Test12");
-									cy.visit("http://localhost/HelpdeskApp/#/ticket/1").wait("@classifierRequest");
-								})
-								```
-
-								wichtig: done callback!!
-							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## cy.on('fail'): Was nicht funktioniert
+							```js
+							it("cy.on", done => {
+								cy.on("fail", error => {
+									if (error.name === "CypressError"
+										&& error.message.toString()
+														.match(/.*timed out waiting `.*` for the 1st request to the route: `classifierRequest`.*/)) {
+											// calling done forces cypress to turn test to green
+											done();
+									}
+								});
+						
+								cy.intercept("POST", /.*getFieldRecommendationsFromText.*/).as("classifierRequest");
+								cy.login("developer", "Test12");
+								cy.visit("http://biehler-josef.de:9500/HD/#/ticket/1").wait("@classifierRequest");
+							})
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Aber Achtung
 							+ Aufruf von done() ermöglicht nicht das zurückkehren an den Ort der Exception
 
 						</textarea>
@@ -1545,8 +1521,23 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
+							## Lösung
+							// code
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
 							## Übung 2 - Lessons learned
 							+ auf Request warten ist essentiell in SPA
+							+ Mittels Bearbeiten der Configuration kann der Client gezielt gesteuert werden, ohne viel Code mocken zu müssen
+							+ Beispiel: Feldvorschläge
+
+							```js
+							loginThroughAPI(null, ctx, {
+								modifyClientConfig: (c: ApplicationConfig): void => {
+								c.classifierEnabled = true;
+							}});
+							```
 						</textarea>
 					</section>
 				</section>
@@ -1557,40 +1548,33 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							+ ablösen von manuellem Test: Durchklicken durch komplette Navigation
 							+ jeden Link anklicken und Überschrift prüfen
 							+ aber was bei Submenüs?
-                            
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## HDA Navigation: Lösung
 							+ Geschickte Kombination von Cypress & JQuery
-							+ wieso nicht immer JQuery nutzen?
-							
-							<aside class="notes" data-markdown>
-								```js
-								let header = "dummy value";
 
-								cy.get("#mainSideBar li:has(a):not(:has(.fa-external-link))").each($e => {
-									const link = cy.wrap($e);
-									link.click();
-									const $subMenu = $e.find("li");
-						
-									if ($subMenu.length > 0) {
-										cy.wrap($subMenu).should("be.visible");
-									} else {
-										cy.get(".container-fluid.page-heading").should($header => {
-											const headerText = $header.text();
-											expect(headerText).not.equal(header);
-											expect(headerText.length).greaterThan(1);
-											header = headerText;
-										});
-									}
-								});
+							<pre><code data-line-numbers="4|5|6|9-11|12-17">
+							let header = "dummy value";
 
-								Das wirft Frage auf: Wieso nicht immer JQuery? 
-								Weil man damit Voteile von Cypress verlioert: retry, logging, etc
-								```
-							</aside>
+							cy.get("#mainSideBar li:has(a):not(:has(.fa-external-link))").each($e => {
+								const link = cy.wrap($e);
+								link.click();
+								const $subMenu = $e.find("li");
+					
+								if ($subMenu.length > 0) {
+									cy.wrap($subMenu).should("be.visible");
+								} else {
+									cy.get(".container-fluid.page-heading").should($header => {
+										const headerText = $header.text();
+										expect(headerText).not.equal(header);
+										expect(headerText.length).greaterThan(1);
+										header = headerText;
+									});
+								}
+							});
+							</code></pre>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -1602,42 +1586,39 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							+ Asynchron!
 							+ Test wird flaky
 
+							![](./own_assets/teamchanged.png)
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Asynchronität in App testen - Erster Versuch
-							```js
-							// siehe code
-							```
+							<pre><code data-line-numbers="3-21">								
+							it("test", () => {
+								let ticket;
+								cy.login("developer", "Test12")
+									.then(async () => ticket = await createTicket("test"))
+									.then(() =>cy.visit("/#/ticket/" + ticket.id))
+									.then(() => {
+										cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.StopEditing").click();
+										cy.get("*[id*=stopProcessing_changeTeamTicketAction]").click();
+										openSelect2("*[data-ui-locator*=teamwidget] div.select2-container", "1st Level Support");
+										cy.get("*[id*=changeTeamInvolvingAction]").choicesSelect("Ticket abschließen")
+										cy.get("*[id*=changeTeamInvolvingAction] .label.with-clear").should("contain", "Ticket abschließen");
+										cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.SaveChangeTeam").click();
+									})
+									.then(() => ticketPool(ticket.title))
+									.then(d => {
+										let isNewInTeam = d.items.find(x => x.id == ticket.id).data["aggregatedColumn_Ticketinfo"].isNewInTeam;
+										expect(isNewInTeam).eq(true)
+									});
+							})
+						</code></pre>
 
 							<aside class="notes" data-markdown>
-								```
-								it("test", () => {
-									let ticket;
-									cy.login("developer", "Test12")
-										.then(async () => ticket = await createTicket("test"))
-										.then(() =>cy.visit("/#/ticket/" + ticket.id))
-										.then(() => {
-											cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.StopEditing").click();
-											cy.get("*[id*=stopProcessing_changeTeamTicketAction]").click();
-											openSelect2("*[data-ui-locator*=teamwidget] div.select2-container", "1st Level Support");
-											cy.get("*[id*=changeTeamInvolvingAction]").choicesSelect("Ticket abschließen")
-											cy.get("*[id*=changeTeamInvolvingAction] .label.with-clear").should("contain", "Ticket abschließen");
-											cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.SaveChangeTeam").click();
-										})
-										.then(() => ticketPool(ticket.title))
-										.then(d => {
-											let isNewInTeam = d.items.find(x => x.id == ticket.id).data["aggregatedColumn_Ticketinfo"].isNewInTeam;
-											expect(isNewInTeam).eq(true)
-										});
-								})
-								```
-
 								Auf Code eingehen
 								+ Pattern "ticket = " laut Cypress unschön, aber es funktioniert
 								+ aber: Aufpassen, dass "ticket" nicht zu früh referenziert wird!
-								+ choicesSelect(): Kleine Funktion um mit Dropdown ukzugeehh
+								+ choicesSelect(): Kleine Funktion um mit Dropdown ukzugeehh -> veraltet
 								+ force: true: verhindert unerwünschtes scrollen etc, aber: Kein Sichtbarkeitscheck!
 								+ choices selectoren: mancmhaml try/error um korrekte rauszufinden
 								+ check auf labek: Um sicherzugehen, dass Aurelia seinen JKob getan hat
@@ -1653,7 +1634,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							+ Möglichkeit 1: Wait()
 							+ Allerdings Schlecht -> Testlaufzeit
 							+ Möglichkeit 2: Warten bis Aktion verarbeitet ist
-
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -1661,36 +1641,13 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							## Asynchronität testen - App anpassen
 							+ App mit spezifischem Code anreichern, um Testen zu erleichtern
 
-						</textarea>
-					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Asynchronität in App testen
-							
 							```js
-							export async function repeat(times, timeout, fn) {
-
-								let result = false;
-								let count = 0;
-							
-								while (count < times && !result) {
-									result = await fn();
-									if (!result) {
-										count++;
-										await sleep(timeout);
-									}
-								}
-							
-								if (!result) {
-									throw new Error("repeater failed");
-								}
-							
-								return result;
-							}
-							
 							export function waitUntilActionIsProcessed(systemAction, ticketId) {
 								function check() {
-									return get("http://localhost/HelpdeskApi/AutomaticTestSupport/IsActionProcessed", { systemAction: systemAction, ticketId: ticketId });
+									return get("http://biehler-josef.de:9500/api/
+										AutomaticTestSupport/IsActionProcessed", 
+											{ systemAction: systemAction, 
+												ticketId: ticketId });
 								}
 							
 								return repeat(400, 250, () => check(this));
@@ -1702,7 +1659,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						<textarea data-template>
 							## Metadaten erzeugen?
 							+ Testen, ob InvolvingAction auftaucht bei Teamwechsel
-
+							// TODO: besser aufbereiten
 							<aside class="notes" data-markdown>
 
 								Beispiel ist aber an den Haaren herbeigezogen
@@ -1742,13 +1699,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							</aside>
 						</textarea>
 					</section>
-					<section data-markdown>
-						<textarea data-template>
-							## Feldempfehlungen testen
-							+ Wie geht das, wenn Classifier deaktiviert ist?
-
-						</textarea>
-					</section>
 				</section>
 				<section>
 					<section data-markdown>
@@ -1756,6 +1706,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							## Mit SPA Frameworks interagieren
 							+ drei Fälle: Events werfen & Queue & Events abhören
 
+							// TODO: beser aufbereiten
 							<aside class="notes" data-markdown>
 								+ Problem erläutern: async, queue, warten auf rendering etc
 								+ Aurelia events
@@ -1939,61 +1890,92 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## DoesFileExist
+							## plugin.js
+
 							```js
-							// siehe code
-							```
+							const fs = require("fs");
 
-							<aside class="notes" data-markdown>
-								```js
-								// plugin
-								const fs = require("fs");
-
-								module.exports = (on, config) => {
-									on("task", {
-										doesFileExist({ path }) {
-											return fs.existsSync(path);
-											}
-									})
-								}
-								
-								// test
-
-								
-								describe("task", () => {
-									it("test", () => {
-										cy.task("doesFileExist", { path: "C:\\Users\\jbiehler\\test.txt" }).then(r => expect(r).eq(true));
-									})
+							module.exports = (on, config) => {
+								on("task", {
+									doesFileExist({ path }) {
+										return fs.existsSync(path);
+										}
 								})
-								```
-							</aside>
+							}
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## test
+
+							```
+							describe("task", () => {
+								it("test", () => {
+									cy.task("doesFileExist", { path: "C:\\Users\\jbiehler\\test.txt" }).then(r => expect(r).eq(true));
+								})
+							})
+							```
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Übung: Task erstellen um cwd auszulesen
-	´
+	´						// TODO: komplexeren anwneudngsfall testen
 						</textarea>
 					</section>
 				</section>
-				<section data-markdown>
-					<textarea data-template>
-						## Diese verflixten Arrays
-						+ HDC Aktualisierung testen
-						+ Siehe Code
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							## Achtung vor Instanceof
+							+ Problem: HDC Ticketliste testen
+							+ Daten (Liste an Tickets) mocken
 
-						<aside class="notes" data-markdown>
-							hdc zeigen & erklären
-							Problem: Ticket anklicken, aktualisiere (via event) -> kommentar sollte erscheinen
-							tut es aber nicht, wegen Arrays!
+							<aside class="notes" data-markdown>
+								hdc zeigen & erklären
+								das war früher ein problem, aber mit inspect() ist es keines mehr
 
-							Code zeigen 9.array.spec
+								// TODO: events?
 
-							btw:
-							dieser Fal ist ein weiteres Beispiel, wie man Events nutzen kann
-							ohne diese Funktion müsste man extra die Daten aktualisieren und auf die Websockets vertrauen
-						</aside>
-					</textarea>
+								btw:
+								dieser Fal ist ein weiteres Beispiel, wie man Events nutzen kann
+								ohne diese Funktion müsste man extra die Daten aktualisieren und auf die Websockets vertrauen
+							</aside>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							<pre><code data-line-numbers="3-9|11-16|18-21">
+							describe("test", () => {
+								beforeEach(() => {
+									Cypress.$("body").append(`
+									<script>
+									document.querySelector("body").arrayObject = [1,2,3]
+									</script>
+									`)
+								})
+							
+								it("test", () => {
+									const array = Cypress.$("body")[0].arrayObject;
+									cy.window().then(win => {
+										assert.isTrue(array instanceof win.Array)
+									})
+								})
+							
+								it("test 2", () => {
+									const array = Cypress.$("body")[0].arrayObject;
+									assert.isTrue(array instanceof Array);
+								})
+							})
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							![](./own_assets/array.png)
+						</textarea>
+					</section>
 				</section>
 				<section>
 					<section data-markdown>
@@ -2173,21 +2155,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					<textarea data-template>
 						## Dashboard
 						![](./own_assets/dashboard.jpg)
-					</textarea>
-				</section>
-				<section>
-					<section data-markdown>
-						<textarea data-template>
-							## Ausblick: Cypress 6.0.0
-							+ cy.route() deprecated
-							+ cy.route2() ersetzt durch cy.intercept()
-							+ as usual: Bugfixes & diverser Kleinkram
-						</textarea>
-					</section>
-				</section>
-				<section data-markdown>
-					<textarea data-template>
-						## Jetzt: Euer Testprojekt entwerfen
 					</textarea>
 				</section>
 			</div>
