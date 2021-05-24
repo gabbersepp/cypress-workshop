@@ -1995,29 +1995,43 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					<section data-markdown>
 						<textarea data-template>
 							## Chrome Debugger Protocol
-							+ alle Instanzen schließen
-							+ Chrome starten: ```chrome.exe --remote-debugging-port=9222```
-							+ Pfad: ```C:\Program Files (x86)\Google\Chrome\Application```
+							+ *chrome.exe --remote-debugging-port=9222 --user-data-dir=....*
+							+ *C:\Program Files (x86)\Google\Chrome\Application*
+							+ *C:\Program Files (x86)\Microsoft\Edge\Application*
 							+ Alle debug Ziele: http://localhost:9222/json
 							+ WS URL kopieren
-							+ mit z.b. "Simple Websocket Client" testen
+							+ Test mit: https://codepen.io/JosefBiehler/pen/gOmmEEr
 
+							<aside class="notes">
+								wer das schnell testen möchte, kann ja die befehle mit ausprobieren
+
+							</aside>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
 							Testbefehl:
 							```js
 							{
 								"id": 1,
 								"method": "Page.navigate",
 								"params": {
-									"url": "https://example.com"
+									"url": "https://de.wikipedia.org/wiki/Softwareentwickler"
 								}
 							}
 							```
-
-							## Miniübung: Jeder einmal ausprobieren
-
-							<aside class="notes" data-template>
-
-							</aside>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Print Mediaquery aktivieren
+							```js
+							{
+								"id": 1,
+								"method": "Emulation.setEmulatedMedia",
+								"params": { "media": "print" }
+							}
+							```
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -2039,15 +2053,10 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					<section data-markdown>
 						<textarea data-template>
 							## CDP + Cypress
-							1. Plugins file:
+							Im Plugins file:
 							+ chrome-remote-interface einbinden (macht vieles einfacher)
 							+ before:browser:launch event behandeln, um Port zu erhalten & Startargumente zu manipulieren
-							+ Tasks für CDP definieren
-
-							```js
-							// siehe code
-							```
-							
+							+ Tasks für CDP definieren							
 							<aside class="notes" data-markdown>
 								cdp.spec.js + plugin file
 								alles bissl erläutern
@@ -2056,10 +2065,50 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
+							<pre><code data-line-numbers="2|4-15|19-21|24-27|28-34">
+							const CDP = require('chrome-remote-interface');
+
+							function ensureRdpPort(args) {
+								const existing = args
+									.find(arg => arg.slice(0, 23) === '--remote-debugging-port')
+							
+								if (existing) {
+									return Number(existing.split('=')[1])
+								}
+							
+								port = 40000 + Math.round(Math.random() * 25000)
+								args.push(`--remote-debugging-port=${port}`)
+								return port
+							}
+
+							let port, client = null;
+							module.exports = (on, config) => {
+								on('before:browser:launch', (browser, args) => {
+									port = ensureRdpPort(args.args);
+								})
+
+								on("task", {
+									activatePrintMediaQuery: async () => {
+										client = client || await CDP({ port });
+										return client.send('Emulation.setEmulatedMedia', { media: "print" })
+									},
+									resetCRI: async () => {
+										if (client) {
+											await client.close();
+										}
+
+										return Promise.resolve(true);
+									}
+								})
+							}
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
 							## Weitere Anwendungsgebiete von CDP
 							+ Native Events absetzen
 							+ Hover (CSS) triggern
-							+ Netzwerk verlangsamen
 							+ ....
 						</textarea>
 					</section>
@@ -2067,12 +2116,13 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 				<section>
 					<section data-markdown>
 						<textarea data-template>
-							## Mehrere Brands abtesten
+							## Mehrere Kunden abtesten
 							+ wie können mit einem Cypress Projekt unterschiedliche Kundenanforderungen getestet werden?
-
+							+ z.b. Ticket schließen mit/ohne Gründe
+							+ versandlabel drucken durch Dienstleister
 							<aside class="notes" data-markdown>
+								Gründe zeigen
 								Konzept der Brands erklären
-								Wie es in HD ausschaut (Brand DLLs)
 								Warum wir uns gegen mehrere cypress projekte/unterordner entschieden haben:
 								+ shared tests
 								+ unübersichtlicher
@@ -2103,12 +2153,14 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							## Lösung für all das
 							+ Steuerung der Tests mittels Tags & Umgebungsvariablen
 							+ WICHTIG: ggf Filterung der Testergebnisse!
-							+ siehe Code 2.brand-tags.spec.js
+							+ siehe Code 25.brand-tags.spec.js
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Steuern des Verhalten von HD
+							+ Authentifizierung
+							+ Wechsel der Auth Tokens je nach benötigten Nutzer
 							+ Erweiterung des Tagkonzepts
 
 							<aside class="notes" data-markdown>
@@ -2123,6 +2175,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						<textarea data-template>
 							## Visuelle Tests
 							+ Tacho testen
+							+ https://docs.cypress.io/guides/tooling/visual-testing#Functional-vs-visual-testing
 							+ Empfehlung: https://github.com/mjhea0/cypress-visual-regression
 
 							<aside class="notes" data-markdown>
@@ -2139,8 +2192,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						+ auch möglich
 						+ ersetzen von Date, ...
 						+ hatten bisher aber keinen Verwendungszweck
-						
-
 					</textarea>
 				</section>
 				<section data-markdown>
@@ -2155,6 +2206,28 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					<textarea data-template>
 						## Dashboard
 						![](./own_assets/dashboard.jpg)
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## Cypress Studio
+						+ Interaktion auf Seite als Test speichern
+						+ geht derzeit nicht mit Firstanswer HD
+						+ https://docs.cypress.io/guides/core-concepts/cypress-studio
+						+ siehe Demo
+
+						<aside class="notes">
+							mit google.de geht es
+						</aside>
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						## Before/after run/spec events
+						+ https://docs.cypress.io/api/plugins/before-run-api
+						+ https://docs.cypress.io/api/plugins/after-run-api
+						+ https://docs.cypress.io/api/plugins/before-spec-api
+						+ https://docs.cypress.io/api/plugins/after-spec-api
 					</textarea>
 				</section>
 			</div>

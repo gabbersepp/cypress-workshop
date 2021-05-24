@@ -1,0 +1,4 @@
+{
+    "baseUrl": "http://biehler-josef.de:9500/HD/",
+    "defaultCommandTimeout": 30000 
+}

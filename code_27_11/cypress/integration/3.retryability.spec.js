@@ -1,11 +1,19 @@
 
 describe("test", () => {
-    it("should + command = vorsicht", () => {
-        const promise = new Promise(resolve => {
-            setTimeout(() => resolve("true"), 1000);
-        })
+    it("nicht alles ist repeatable", () => {
+        let i = 0;
+        cy.get("body").then($e => {
+            console.log(i++);
+            expect(i).to.eq(2);
+        });
+    });
 
-        cy.then(() => promise).should("contain", "true")
-
+    
+    it("nicht alles ist repeatable - fix", () => {
+        let i = 0;
+        cy.get("body").should($e => {
+            console.log(i++);
+            expect(i).to.eq(2);
+        });
     })
 })

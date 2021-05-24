@@ -11,7 +11,7 @@ function ensureRdpPort(args) {
     port = 40000 + Math.round(Math.random() * 25000)
     args.push(`--remote-debugging-port=${port}`)
     return port
-  }
+}
 
 let port, client = null;
 module.exports = (on, config) => {
@@ -25,7 +25,7 @@ module.exports = (on, config) => {
          },
          activatePrintMediaQuery: async () => {
             client = client || await CDP({ port });
-            return client.send('Emulation.setEmulatedMedia', { media: "print" })
+            return client.send('Emulation.setEmulatedMedia', { "media": "print" })
         },
         resetCRI: async () => {
             if (client) {
