@@ -1,6 +1,7 @@
 describe("should", () => {
     it("test", () => {
-        cy.visit("http://localhost/HelpdeskApp/#/person/5");
+        cy.login("developer", "Test12")
+        cy.visit("http://biehler-josef.de:9500/HD/#/person/5");
         cy.get("div").contains("Neues System Feld 1").parent().find("input-check-box-component").wait(500)
         .then($e => {
             debugger;

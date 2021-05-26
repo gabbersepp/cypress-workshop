@@ -1,3 +1,7 @@
+let token;
+
+Cypress.Commands.add("token", () => token);
+
 Cypress.Commands.add("login", (username, pw) => {
     function loginViaFetch(user, pw) {
         const formData = new URLSearchParams();
@@ -14,6 +18,7 @@ Cypress.Commands.add("login", (username, pw) => {
 
     function saveToken(data) {
         const { access_token, refresh_token, expires_in } = data;
+        token = access_token;
         const expiry = new Date().getTime() + parseInt(expires_in * 1000);
         window.localStorage.setItem("hd_auth_token", JSON.stringify({
             accessToken: access_token,

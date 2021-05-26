@@ -56,6 +56,7 @@
 							<li>https://twitter.com/JosefBiehler</li>
 							<li>https://twitter.com/KackDev</li>
 							<li>https://github.com/gabbersepp</li>
+							<li>https://dev.to/gabbersepp</li>
 						</ul>
 					</section>
 					<section data-markdown>
@@ -113,8 +114,12 @@
 					<section data-markdown>
 						<textarea data-template>
 							## Startprojekt
-							[https://github.com/gabbersepp/cypress-workshop/tree/master/prepared](https://github.com/gabbersepp/cypress-workshop/tree/master/prepared)
-
+							[https://github.com/gabbersepp/cypress-workshop/tree/master/startproject](https://github.com/gabbersepp/cypress-workshop/tree/master/startproject)
+							+ *npm install* nicht vergessen
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
 							## VS Code templates
 							+ Gerade für Neueinsteiger im Team
 							+ Hürden abbauen
@@ -149,7 +154,8 @@
 							```js
 							describe("erster test", () => {
 								it("blabla", () => {
-									cy.visit("https://samhammer.de").should("contain", "Samhammer")
+									cy.visit("https://samhammer.de");
+									cy.get("body").should("contain", "Samhammer");
 								})
 							})
 							```
@@ -376,14 +382,35 @@
 							+ Suchergebnis anklicken
 
 							## Übung 2
-							+ Prüfen, ob scrollTop von "*[ref='scrollableChat']" größer als 0 ist
+							+ https://docs.cypress.io/ aufrufen
+							+ Prüfen ob Text von jedem H3 größer 0 ist
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Lösung
+							## Lösung 1
 							```js
-							// siehe code
+							it("cy.type", () => {
+								cy.visit("https://docs.cypress.io/")
+								cy.get('.DocSearch-Button-Placeholder').click();
+								cy.get('#docsearch-input').type('cy.type').wait(1000);
+								cy.get('.DocSearch-Hit').first().click();
+							})
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Lösung 2
+							```js
+							it("h3", () => {
+								cy.visit("https://docs.cypress.io");
+								cy.get("h3").then($divs => {
+									for(let i = 0; i < $divs.length; i++) {
+										expect($divs[i].textContent.length).greaterThan(0)
+									}
+								})
+							})
 							```
 						</textarea>
 					</section>
@@ -568,6 +595,12 @@
 					<section data-markdown>
 						<textarea data-template>
 							## Demo
+
+							<aside class="notes">
+								+ mittels fetch() Daten laden: https://testimonialapi.toolcarton.com/api
+								+ debugger um daten anzuschauen
+								+ irgendeinen assert
+							</aside>
 						</textarea>
 					</section>
 				</section>
@@ -585,27 +618,6 @@
 						https://glebbahmutov.com/blog/
 
 					</textarea>
-				</section>
-				<section>
-					<section data-markdown>
-						<textarea data-template>
-							## Übung
-							+ Amazon.de besuchen
-							+ Lenovo suchen
-							+ sicherstellen, dass mindestens ein Suchergebnis vorhanden ist
-
-							// TODO: evtl Tipps?
-						</textarea>
-					</section>
-
-					<section data-markdown>
-						<textarea data-template>
-							## Lösung
-							```js
-							// siehe Code
-							```
-						</textarea>
-					</section>
 				</section>
 				
 				<section data-markdown>
@@ -662,11 +674,15 @@
 							## Demo
 
 							<aside class="notes" data-markdown>
-								Einloggen, mit fetch() und axios() irgendeinen request machen und drauf warten
+								mit fetch() / fetch / axios() irgendeinen request machen und drauf warten
+								nicht im HD
+								https://testimonialapi.toolcarton.com/api
+								fetch achtung: gibt es nicht unter nodejs, wir nutzen axios
 							</aside>
 						</textarea>
 					</section>
-
+				</section>
+				<section>
 					<section data-markdown>
 						<textarea data-template>
 							## Login als Custom Command?
@@ -857,15 +873,54 @@
 					<section data-markdown>
 						<textarea data-template>
 							## Übung
-							+ HD aufrufen und prüfen, ob die Seite geladen hat (anhand irgendeines Elementes)
+							+ HD aufrufen
+							+ Element "#usernameinput" anfordern
+							+ should + callback nutzen
+							+ prüfen, ob Element vorhanden ist
+							+ nein -> Exception werfen, ja -> weiter im Text
+							+ Element loggen
+							+ prüfen, ob element attribut 'type' = 'text'
+
+							```js
+							...should($e => {
+								// $e prüfen
+								// $e loggen
+								// assert
+							})
+							```
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Lösung
-							```js
-							// siehe Code
-							```
+							<pre><code data-line-numbers="5|6|7-11|12|15-22|24">
+							describe("HD", () => {
+								it("should be loaded", () => {
+									cy.visit("/");
+									cy.get("#usernameinput").should($e => {
+										if ($e.length === 0) {
+											Cypress.log({
+												name: 'Element noch nicht da',
+												displayName: 'Element noch nicht da',
+												message: `Element noch nicht da`,
+											});
+											throw new Error();
+										}
+							
+										Cypress.log({
+											name: 'Element da',
+											displayName: 'Element da',
+											message: `Element da`,
+											consoleProps: () => ({
+												placeholder: $e[0].placeholder
+											})
+										});
+							
+										expect($e.attr("type")).to.eq("text")
+									});
+								})
+							})
+							</code></pre>
 						</textarea>
 					</section>
 				</section>
@@ -905,12 +960,53 @@
 
 							## Tipps
 							+ ID von Button: #shellnewticket
+							```js
+							Cypress.Commands.add(.....);
+							```
 
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Lösung
+							<pre><code data-line-numbers="2|3|4|6-12|13-16|17|27">
+							Cypress.Commands.add("newTicket2", function() { // function!
+								cy.location().its("hash").as("hash_old")
+								cy.get("#shellnewticket").click();
+								cy.location().then(loc2 => {
+									if (loc2 === this.hash_old) {
+										Cypress.log({
+											displayName: "BlaBla",
+											message: "hashes sind gleich"
+										})
+										throw new Error()
+									}
+									Cypress.log({
+										displayName: "BlaBla",
+										message: `Hash alt: ${this.hash_old}, neu: ${loc2.hash}`
+									})
+									const identifier = loc2.hash.match(/.*(n[0-9]+)/)[1];
+									return identifier;
+								})
+							});							
+							
+							describe("test", () => {
+								it("", () => {
+									cy.login("developer", "Test12")
+									cy.visit("/#/ticket/1")
+									cy.newTicket2().then(id => {
+										Cypress.log({
+											displayName: "Ticket",
+											message: "TicketId is " + id
+										})
+									})
+								})
+							})
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Achtung
 							+ Location abgleichen!
 							+ should() kann den returnvalue nicht manipulieren
 
@@ -932,14 +1028,15 @@
 						<textarea data-template>
 							## Locator
 							Nun können wir folgendes machen:
-							```js
+							<pre><code data-line-numbers="5">
 							it("test2", () => {
 								cy.login("developer", "test");
 								cy.newTicket().then(id => {
 									cy.get(`#Title${id} input`).type("test");
 								})
 							})
-							```
+							</code></pre>
+
 							Damit können wir mehrere Tickettabs geschickt ansprechen
 						</textarea>
 					</section>
@@ -1148,6 +1245,27 @@
 							</aside>
 						</textarea>
 					</section>
+					<section data-markdown>
+						<textarea data-template>
+							<pre><code data-line-numbers="9-13">
+							describe("should", () => {
+								it("test", () => {
+									cy.login("developer", "Test12")
+									cy.visit("http://biehler-josef.de:9500/HD/#/person/5");
+									cy.get("div").contains("Neues System Feld 1").parent().find("input-check-box-component").wait(500)
+									.then($e => {
+										debugger;
+										if ($e.find("img[src*='CheckBox_No']").length > 0) {
+											cy.wrap($e).click();
+										} else if ($e.find("img[src*='CheckBox_Yes']").length > 0) {
+											// do nothing                
+										}
+									})
+								})
+							})
+							</code></pre>
+						</textarea>
+					</section>
 
 					<section data-markdown>
 						<textarea data-template>
@@ -1345,8 +1463,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					<section data-markdown>
 						<textarea data-template>
 							## Demo
-
-							// TODO: mehr machen?
 							
 							<aside class="notes" data-markdown>
 								```js
@@ -1377,17 +1493,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							</aside>
 						</textarea>
 					</section>
-					<section data-markdown>
-						<section data-template>
-							## Übung
-							// TODO: besser ausformulieren, selber machen
-							+ Ticket aufrufen
-							+ Auf Request getTicket warten
-
-						</section>
-					</section>
-				</section>
-				<section>
 					<section data-markdown>
 						<textarea data-template>
 							## Fixtures
@@ -1510,24 +1615,35 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						</textarea>
 					</section>
 					<section data-markdown>
-						<textarea data-template>
-							## Übung 1
-							+ Testen, ob das Javascript Bundle app.js geladen wird
-							
-							## Übung 2
-							+ Seite aufrufen, warten bis das Laden der Configuration abgeschlossen ist und die Config im debugger betrachten
-							
-						</textarea>
+						<section data-template>
+							## Übung
+							+ Auf Request *getTicket* warten
+							+ *title* des Tickets auf *Spartakiade* abändern
+							+ http://biehler-josef.de:9500/HD/#/ticket/1 aufrufen
+							+ Tickettitel abprüfen
+						</section>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Lösung
-							// code
+							```js
+							describe("test", () => {
+								it("test", () => {
+									cy.login("developer", "Test12");
+									cy.intercept("GET", /.*getTicket.*/i, req => {
+										req.continue(interceptor => {
+											interceptor.body.title = "Spartakiade";
+										})
+									})
+									cy.visit("/#/ticket/1")
+										.get("#Title1 input").should("have.value", "Spartakiade")
+								})
+							})
+							```
 						</textarea>
-					</section>
+					</section>	
 					<section data-markdown>
 						<textarea data-template>
-							## Übung 2 - Lessons learned
+							## Requests mocken - Fazit
 							+ auf Request warten ist essentiell in SPA
 							+ Mittels Bearbeiten der Configuration kann der Client gezielt gesteuert werden, ohne viel Code mocken zu müssen
 							+ Beispiel: Feldvorschläge
@@ -1659,44 +1775,59 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						<textarea data-template>
 							## Metadaten erzeugen?
 							+ Testen, ob InvolvingAction auftaucht bei Teamwechsel
-							// TODO: besser aufbereiten
-							<aside class="notes" data-markdown>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Metadaten erzeugen?
+							<pre><code data-line-numbers="2-14|19-33|35|39-42|44-45">
+function provideMetadata(data, identifier) {
+    return cy.token().then(t => {
+        return cy.request({
+            method: "POST",
+            url: `http://biehler-josef.de:9500/api/AutomaticTestSupport/ProvideCustomMetadata?identifier=${identifier}`,
+            headers: {
+                "Authorization": "Bearer " + t,
+                "X-Auth-ClientId": "local-test-hd"
+            },
+            body: data
+        })
+    });
+}
 
-								Beispiel ist aber an den Haaren herbeigezogen
-								Kann das auch nur lokal zeigen, weil Änderungen ned deployed Sind
-								manuell einloggen
-								manuell ticketöffnen!
+describe("Involving Actions", () => {
+    it("test", () => {
+        cy.login("developer", "Test12");
+        provideMetadata({
+            allColumns: [],
+            involvingActions: [
+                {
+                    key: "ChangeTeamAction",
+                    name: "ChangeTeamAction",
+                    items: [
+                        { 
+                            name: "käse",
+                            key: "käse"
+                        }
+                    ]
+                }
+            ]
+        }, "actions")
+        .intercept("GET", /.*GetAllInvolvingActions.*/i, r => {
+            r.headers["x-hd-test-identifier"] = "actions"
+        })
+        .visit("http://biehler-josef.de:9500/HD/#/ticket/1")
 
-								```js
-								it("test", () => {
-									cy.login("developer", "Test12");
-									cy.then(() => provideMetadata({
-										involvingActions: [
-											{
-												key: "ChangeTeamAction",
-												name: "ChangeTeamAction",
-												items: [
-													{ 
-														name: "käse"
-													}
-												]
-											}
-										]
-									}, "actions"))
-									
-									cy.route2("GET", /.*GetAllInvolvingActions.*/i, r => {
-										r.headers["x-hd-test-identifier"] = "actions"
-									}).as("involvingactions");
-									cy.then(() => createTicket("wurst"))
-									.then(t => cy.visit("/#/ticket/" + t.id))
-							
-									cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.StopEditing").click();
-									cy.get("*[id*=stopProcessing_changeTeamTicketAction]").click();
-							
-									cy.get("*[data-ui-locator*=reasonWidget] .label").should("contain", "käse");
-								})
-								```
-							</aside>
+        cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.StopEditing")
+			.click();
+        cy.get("*[id*=stopProcessing_changeTeamTicketAction]")
+			.click();
+
+        cy.get("*[data-ui-locator*=reasonWidget] .label")
+			.should("contain", "käse");
+    })
+})
+							</code></pre>
 						</textarea>
 					</section>
 				</section>
@@ -1706,7 +1837,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							## Mit SPA Frameworks interagieren
 							+ drei Fälle: Events werfen & Queue & Events abhören
 
-							// TODO: beser aufbereiten
 							<aside class="notes" data-markdown>
 								+ Problem erläutern: async, queue, warten auf rendering etc
 								+ Aurelia events
@@ -1715,8 +1845,9 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Events
+							## Events werfen
 							+ Test: Betroffener CI-Kontakt entfernen, wenn CI gelöscht wird
+							+ Event simulieren
 
 							<aside class="notes" data-markdown>
 								CI zeigen, betroffenen kontakt zeigen, usecase ci löschen
@@ -1725,39 +1856,42 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Events 
+							## Events werfen
+
 							Code in HD:
 							```js
 							if (window.Cypress) {
+								// EventAggregator ist eine Klasse von uns
 								window.eventAggregator = aurelia.container.get(EventAggregator);
 							}
 							```
-
-							<aside class="notes" data-markdown>
-								normalerweise würde man das ticket über die API anlegen^
-
-								```js
-								describe("events", () => {
-									function publishAureliaEvent(event, data) {
-										cy.window().then(win => win.eventAggregator.publish(event, data));
-									}
-								
-									// ticket anlegen mit betroffenen kontakt
-									it("test", () => {
-										cy.login("developer", "Test12");
-										cy.visit("/#/ticket/29")
-										cy.get(".calling-card").should("contain", "ci")
-										publishAureliaEvent(`entity:configurationitem:deleted:9`, 9);
-										cy.get(".calling-card").should("not.contain", "ci")
-									})
-								})
-								```
-							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Events faken - Vorteile
+							## Events werfen
+
+							Test:
+
+							<pre><code data-line-numbers="">
+							function publishAureliaEvent(event, data) {
+								cy.window().then(win => win.eventAggregator.publish(event, data));
+							}
+						
+							// ticket anlegen mit betroffenen kontakt
+							it("test", () => {
+								cy.login("developer", "Test12");
+								cy.visit("/#/ticket/29")
+								cy.get(".calling-card").should("contain", "ci")
+								publishAureliaEvent(`entity:configurationitem:deleted:9`, 9);
+								cy.get(".calling-card").should("not.contain", "ci")
+							})
+							</code></pre>
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Events werfen - Vorteile
 							+ keine Websockets notwendig
 							+ Vermeiden von Fehlerquellen
 							+ Deterministisches Verhalten
@@ -1780,9 +1914,11 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						<textarea data-template>
 							## Fall 2: Queue
 							Änderungen an HD:
+
 							```js
 							if ((window as any).Cypress) {
-								(window as any).aureliaTaskQueue = (window as any).taskQueue = DependencyResolver.resolve<TaskQueue>(TaskQueue);
+								(window as any).aureliaTaskQueue = (window as any).taskQueue =
+									DependencyResolver.resolve<TaskQueue>(TaskQueue);
 							}
 							```
 
@@ -1790,8 +1926,10 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							```js
 							function waitForTaskQuue() {
 								const randomFieldName = new Date().getTime().toString();
-								cy.window().then(win => win.aureliaTaskQueue.queueTask(() => win[randomFieldName] = true));
-								cy.window().should(win => expect(win[randomFieldName]).to.equal(true));
+								cy.window().then(win => win.aureliaTaskQueue.queueTask(() => 
+									win[randomFieldName] = true));
+								cy.window().should(win => 
+									expect(win[randomFieldName]).to.equal(true));
 							}
 							```
 						</textarea>
@@ -1809,49 +1947,52 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							## Events abhören - Beispiel
 							+ Wechsel zu neuem Tickettab
 							+ Prüfen, ob korrekter Tab angezeigt wird
-
-							<aside class="notes" data-markdown>
-								```js
-								describe("events", () => {
-									function setupEventHandler(event) {
-										const container = {};
-									
-										cy.window({ log: false }).then((win) => {
-											cy.log("setup eventhandler for: " + event);
-											const handler = (args) => {
-												win.document.removeEventListener(event, handler);
-												container.event = args;
-												container.passed = true;
-											};
-											win.document.addEventListener(event, handler, false);
-										});
-									
-										return container;
-									}
-								
-									function onTabsChanged() {
-										return setupEventHandler("tabsHub:activeTabChanged");
-									}
-								
-									it("tab change fix", () => {
-										cy.login("developer", "Test12")
-										cy.visit("/#/ticket/1").get("#ticketBaseRoot1 ticket-info");
-										cy.visit("/#/ticket/2").get("#ticketBaseRoot2 ticket-info");
-								
-										const event = onTabsChanged();
-								
-										cy.window().then(win => {
-											win.location.replace("http://localhost/HelpdeskApp/#/ticket/1")
-										})
-								 
-										cy.wrap(event).should(c => expect(c.passed).to.eq(true))
-										cy.get("*[data-active='true'] .tab-text").then($e => expect($e.text().indexOf("1") > -1).eq(true))
-									})
-								})
-								```
-							</aside>
 						</textarea>
 					</section>		
+					<section data-markdown>
+						<textarea data-template>
+							<pre><code data-line-numbers="2-16|18-20|24-27|29|31-34|36">
+							function setupEventHandler(event) {
+								const container = {};
+							
+								cy.window({ log: false }).then((win) => {
+									cy.log("setup eventhandler for: " + event);
+									const handler = (args) => {
+										win.document.removeEventListener(event, handler);
+										container.event = args;
+										container.passed = true;
+									};
+									win.document.addEventListener(event, handler, false);
+								});
+							
+								return container;
+							}
+						
+							function onTabsChanged() {
+								return setupEventHandler("tabsHub:activeTabChanged");
+							}
+						
+							it("tab change fix", () => {
+								cy.login("developer", "Test12")
+								cy.visit("/#/ticket/1")
+									.get("#ticketBaseRoot1 ticket-info");
+								cy.visit("/#/ticket/2")
+									.get("#ticketBaseRoot2 ticket-info");
+						
+								const event = onTabsChanged();
+						
+								cy.window().then(win => {
+									win.location
+										.replace("http://localhost/HelpdeskApp/#/ticket/1")
+								})
+							
+								cy.wrap(event).should(c => expect(c.passed).to.eq(true))
+								cy.get("*[data-active='true'] .tab-text")
+									.then($e => expect($e.text().indexOf("1") > -1).eq(true))
+							})
+							</code></pre>
+						</textarea>
+					</section>
 					<section data-markdown>
 						<textarea data-template>
 							## Events abhören
@@ -1899,7 +2040,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 								on("task", {
 									doesFileExist({ path }) {
 										return fs.existsSync(path);
-										}
+									}
 								})
 							}
 							```
@@ -1907,7 +2048,7 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## test
+							## Test
 
 							```
 							describe("task", () => {
@@ -1920,8 +2061,36 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 					</section>
 					<section data-markdown>
 						<textarea data-template>
-							## Übung: Task erstellen um cwd auszulesen
-	´						// TODO: komplexeren anwneudngsfall testen
+							## Übung
+							+ Task erstellen um cwd auszulesen
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							## Lösung
+							```js
+							// plugins
+							module.exports = (on, config) => {
+								on("task", {
+									cwd() {
+										return process.cwd()
+									}
+								})
+							}
+
+							// spec
+							it("test", () => {
+								cy.task("cwd").then(cwd => {
+									Cypress.log({
+										displayName: "CWD",
+										message: "cwd ist " + cwd,
+										consoleProps: () => ({
+											cwd
+										})
+									})
+								})
+							})
+							```
 						</textarea>
 					</section>
 				</section>
@@ -1935,12 +2104,6 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 							<aside class="notes" data-markdown>
 								hdc zeigen & erklären
 								das war früher ein problem, aber mit inspect() ist es keines mehr
-
-								// TODO: events?
-
-								btw:
-								dieser Fal ist ein weiteres Beispiel, wie man Events nutzen kann
-								ohne diese Funktion müsste man extra die Daten aktualisieren und auf die Websockets vertrauen
 							</aside>
 						</textarea>
 					</section>
@@ -2229,6 +2392,20 @@ cy.get("#ticketPoolResultTable .generic-table-row")
 						+ https://docs.cypress.io/api/plugins/before-spec-api
 						+ https://docs.cypress.io/api/plugins/after-spec-api
 					</textarea>
+				</section>
+				<section>
+					<section data-markdown>
+						<textarea data-template>
+							## Automatisierungen
+							+ Cypress kann noch mehr
+							+ Crawlen von Slack
+							+ https://github.com/gabbersepp/slack-crawler
+
+							<aside class="notes">
+								besser als puppeteer, da wait etc automatisch
+							</aside>
+						</textarea>
+					</section>
 				</section>
 			</div>
 		</div>
