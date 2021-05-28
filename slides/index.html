@@ -178,6 +178,9 @@
 							+ kann jederzeit betrachtet werden
 							+ Achtung: Speicherhungrig!
 	
+							<aside class="notes">
+								UI zeigen, rumspielen, fehlschlagen lassen
+							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -253,10 +256,6 @@
 								// Logik und Asserts
 							})
 							```
-							
-							<aside class="notes" data-markdown>
-								Beispiel coden!
-							</aside>
 						</textarea>
 					</section>
 					<section data-markdown>
@@ -351,15 +350,6 @@
 							## Selektoren bestimmen
 							+ manchmal schwierig, wenn Elemente Fokus verlieren
 							+ da hilft: interaktive Modus und DOM Snapshots!
-
-							<aside class="notes" data-markdown>
-								Z.b. toastermeldung, welche verschwindet, im HD zeigen?
-
-								```
-								cy.visit("http://biehler-josef.de:9500/HD/#/ticket/635");
-								cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.Save").click()
-								```
-							</aside>
 						</textarea>
 					</section>
 
@@ -371,6 +361,13 @@
 								get, first, last, focus, type, click, wrap
 
 								Beispiel mit should cb
+								
+								Z.b. toastermeldung, welche verschwindet, im HD zeigen?
+
+								```
+								cy.visit("http://biehler-josef.de:9500/HD/#/ticket/635");
+								cy.get("#actionButton_views\\.Ticket\\.ActionButtons\\.Save").click()
+								```
 							</aside>
 						</textarea>
 					</section>
@@ -600,6 +597,8 @@
 								+ mittels fetch() Daten laden: https://testimonialapi.toolcarton.com/api
 								+ debugger um daten anzuschauen
 								+ irgendeinen assert
+								+ fehlschlagen lassen -> Screenshot
+								+ Video
 							</aside>
 						</textarea>
 					</section>
@@ -640,7 +639,7 @@
 							```js
 							cy.visit("/#/login");
 							cy.get("#usernameinput").type("developer");
-							cy.get("#passwordinput").type("test");
+							cy.get("#passwordinput").type("Test12");
 							cy.get("#loginbutton").click();
 							cy.get(".add-tab-btn").should("exist");
 							```
@@ -674,7 +673,7 @@
 							## Demo
 
 							<aside class="notes" data-markdown>
-								mit fetch() / fetch / axios() irgendeinen request machen und drauf warten
+								mit fetch() / request / axios() irgendeinen request machen und drauf warten
 								nicht im HD
 								https://testimonialapi.toolcarton.com/api
 								fetch achtung: gibt es nicht unter nodejs, wir nutzen axios
