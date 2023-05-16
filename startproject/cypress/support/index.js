@@ -30,3 +30,14 @@ Cypress.Commands.add("login", (username, pw) => {
             cy.visit("/")
         })
 })
+
+Cypress.Commands.add("newTicket", () => {
+    cy.location().then(loc => {
+        cy.get("#shellnewticket").click().get("body").click();
+        cy.location().should(loc2 => expect(loc.hash).not.eq(loc2.hash))
+        .then(loc2 => {
+            const identifier = loc2.hash.match(/.*(n[0-9]+)/)[1];
+            return identifier;
+        })
+    })
+ });

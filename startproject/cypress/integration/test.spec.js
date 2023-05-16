@@ -2,7 +2,7 @@
 
 describe("test", () => {
     it("test", () => {
-        cy.visit("https://samhammer.de");
-        cy.get("body").should("contain", "Samhammer");
+        cy.visit("https://google.de");
+        cy.get("body").then().should("contain", "Samhammer");
     })
 }); 

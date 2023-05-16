@@ -1,4 +1,5 @@
 {
     "baseUrl": "http://biehler-josef.de:9500/HD/",
-    "defaultCommandTimeout": 30000 
+    "defaultCommandTimeout": 30000 ,
+    "experimentalStudio": true
 }
